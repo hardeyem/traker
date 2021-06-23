@@ -23,6 +23,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: new AppLogger()
   })
+  // app.useWebSocketAdapter(new IoAdapter(httpServer));
 
   app.use(
     rateLimit({
@@ -38,6 +39,6 @@ async function bootstrap() {
   app.disable('x-powered-by');
   app.enableCors();
 
-  await app.listen(CONFIG.port);
+  await app.listenAsync(CONFIG.port);
 }
 bootstrap();
