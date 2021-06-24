@@ -1,4 +1,6 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+
 import { AppModule } from './app.module';
 
 import * as path from 'path';
@@ -24,6 +26,9 @@ async function bootstrap() {
     logger: new AppLogger()
   })
   // app.useWebSocketAdapter(new IoAdapter(httpServer));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true
+  }));
 
   app.use(
     rateLimit({
