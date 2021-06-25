@@ -7,6 +7,7 @@ import { SharedModule } from './shared/shared.module';
 import { ConfigModule } from '@nestjs/config';
 import { RepositoryModule } from './repository/repository.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { WebsocketModule } from './websocket/websocket.module';
 
 import config from './core/config/config';
 import databaseConfig from './core/config/database';
@@ -24,7 +25,8 @@ import databaseConfig from './core/config/database';
     CoreModule, 
     SharedModule, 
     RepositoryModule,
-    ApiModule, 
+    ApiModule,
+    WebsocketModule, 
   ],
   controllers: [AppController],
   providers: [AppService],
