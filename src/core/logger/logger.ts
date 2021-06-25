@@ -12,6 +12,7 @@ export class AppLogger extends Logger implements LoggerService {
 
   log(message: string, data:any = null) {
     super.log(message, data);
+    console.log(message);
   }
 
   error(message: string, trace: string) {

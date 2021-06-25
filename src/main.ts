@@ -11,6 +11,8 @@ import { createStream } from 'rotating-file-stream';
 import { AppLogger } from './core';
 import config from './core/config/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { WsAdapter } from '@nestjs/platform-ws';
+import { SocketIoAdapter } from './websocket/socketio.adapter';
 
 
 async function bootstrap() {
@@ -24,8 +26,9 @@ async function bootstrap() {
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: new AppLogger()
-  })
-  // app.useWebSocketAdapter(new IoAdapter(httpServer));
+  });
+  app.useWebSocketAdapter(new SocketIoAdapter(app, true));
+
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true
   }));
@@ -33,7 +36,7 @@ async function bootstrap() {
   app.use(
     rateLimit({
       windowMs: 1000, // 1sec
-      max: 10000, // limit each IP to 100 requests per windowMs
+      max: 100, // limit each IP to 100 requests per windowMs
     })
   );
 

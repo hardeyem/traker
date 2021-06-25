@@ -8,6 +8,7 @@ import { EventGateway } from './event-gateway';
         SharedModule,
         CoreModule
     ],
-    providers: [EventGateway]
+    providers: [EventGateway],
+    exports: [EventGateway]
 })
 export class WebsocketModule {}

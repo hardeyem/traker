@@ -49,7 +49,8 @@ export class AssetService {
                 lastKnownLocation: {
                     coordinates: [locData.longitude, locData.latitude],
                     address: locData.address
-                }
+                },
+                lastBroadcastTime: new Date()
             }
        }).exec();
     }

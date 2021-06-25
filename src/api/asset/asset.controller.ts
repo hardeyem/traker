@@ -3,6 +3,7 @@ import { AppLogger } from 'src/core';
 import { UtiliHelpers } from 'src/shared/classes/helpers';
 import { AddAssetDTO, AssetLocationUpdateDTO } from 'src/shared/dtos/asset.dto';
 import { AssetService } from 'src/shared/services/asset/asset.service';
+import { EventGateway } from 'src/websocket/event-gateway';
 
 /**
  * Asset Controller exposes asset based endpoint
@@ -13,6 +14,7 @@ export class AssetController {
     constructor(
         private assetSvc: AssetService,
         private logger: AppLogger,
+        private websocketGatewayProvider: EventGateway,
 
     ) {}
 
@@ -49,7 +51,10 @@ export class AssetController {
     async updateAssetLocation(@Request() req, @Response() res, @Param() params, @Body() body: AssetLocationUpdateDTO){
         try {
             await this.assetSvc.updateLocation(params.assetId, body);
-            return UtiliHelpers.sendJsonResponse(res, {}, 'Asset Location updated', HttpStatus.CREATED);
+            const asset = await this.assetSvc.getByAssetId(params.assetId);
+            console.log('got assest', asset);
+            this.websocketGatewayProvider.broadcastAssetLocation(params.assetId, asset);
+            return UtiliHelpers.sendJsonResponse(res, {asset}, 'Asset Location updated', HttpStatus.CREATED);
         } catch (error) {
             this.logger.error(error.toString(), error);
         }

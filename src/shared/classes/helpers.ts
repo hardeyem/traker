@@ -39,4 +39,55 @@ export class UtiliHelpers {
 
         throw new HttpException(resData, status)
     }
+
+    /**
+     * Throttle a function call based on sepcify duration
+     * @param duration 
+     * @param callback 
+     * @returns 
+     */
+    static throttle(duration, callback){
+        return function(){
+            const context = this;
+            setTimeout(()=> {
+                callback.apply(context);
+            }, duration);
+        }
+    }
+
+    /**
+     * validate and object against required parameters
+     * @param obj 
+     * @param requiredParam {name: string, type: string}
+     * @returns {success: boolean, message: string[]}
+     */
+    static validParam(obj, requiredParam) {
+        const objKeys = Object.keys(obj);
+        const failed = [];
+        let success = true;
+    
+        requiredParam.forEach((param, index) => {
+            const idx = objKeys.findIndex(k => {
+                return k === param.name;
+            });
+    
+            if (idx < 0) {
+                failed.push(`${param.name} not found`);
+                success = false;
+            } else if (param.type && (typeof obj[param.name] != param.type)) {
+                failed.push(`${param.name} should be ${param.type}`);
+                success = false;
+            }
+
+            if(typeof obj[param.name] == "string" && obj[param.name].trim() == ""){
+                failed.push(`${param.name} is empty`);
+                success = false;
+             }
+        });
+    
+        return {
+            success: success,
+            message: failed
+        };
+    };
 }
