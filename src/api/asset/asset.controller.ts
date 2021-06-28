@@ -1,9 +1,7 @@
 import { Body, Controller, Post, Request, Get, Response, HttpStatus, Param, Put } from '@nestjs/common';
-import { AppLogger } from 'src/core';
-import { UtiliHelpers } from 'src/shared/classes/helpers';
-import { AddAssetDTO, AssetLocationUpdateDTO } from 'src/shared/dtos/asset.dto';
-import { AssetService } from 'src/shared/services/asset/asset.service';
-import { EventGateway } from 'src/websocket/event-gateway';
+import { UtiliHelpers,  AddAssetDTO, AssetLocationUpdateDTO, AssetService} from '../../shared';
+import { EventGateway } from '../../websocket';
+import { AppLogger } from '../../core';
 
 /**
  * Asset Controller exposes asset based endpoint
@@ -29,7 +27,7 @@ export class AssetController {
     async addAsset(@Request() req, @Response() res, @Body() body: AddAssetDTO){
 
         try {
-            const asset = await this.assetSvc.addAsset(body);   
+            const asset = await this.assetSvc.addAsset(body); 
             return UtiliHelpers.sendJsonResponse(res, {asset}, 'Asset created', HttpStatus.CREATED);
         } catch (error) {
             this.logger.error(error.toString(), error);
@@ -52,9 +50,10 @@ export class AssetController {
         try {
             await this.assetSvc.updateLocation(params.assetId, body);
             const asset = await this.assetSvc.getByAssetId(params.assetId);
-            console.log('got assest', asset);
-            this.websocketGatewayProvider.broadcastAssetLocation(params.assetId, asset);
-            return UtiliHelpers.sendJsonResponse(res, {asset}, 'Asset Location updated', HttpStatus.CREATED);
+            setTimeout(()=> {
+                this.websocketGatewayProvider.broadcastAssetLocation(params.assetId, asset);
+            }, 1000);
+            return UtiliHelpers.sendJsonResponse(res, {asset}, 'Asset Location updated', HttpStatus.OK);
         } catch (error) {
             this.logger.error(error.toString(), error);
         }
@@ -72,7 +71,7 @@ export class AssetController {
     async getAllAsset(@Request() req, @Response() res){
         try {
             const assets = await this.assetSvc.getAllAssets();
-            return UtiliHelpers.sendJsonResponse(res, {assets}, 'Got assest', HttpStatus.CREATED);
+            return UtiliHelpers.sendJsonResponse(res, {assets}, 'Got assest', HttpStatus.OK);
         } catch (error) {
             this.logger.error(error.toString(), error);
         }
@@ -91,7 +90,7 @@ export class AssetController {
     async getByAssetId(@Request() req, @Response() res, @Param() params){
         try {
             const assets = await this.assetSvc.getByAssetId(params.assetId);
-            return UtiliHelpers.sendJsonResponse(res, {assets}, 'Got assest', HttpStatus.CREATED);
+            return UtiliHelpers.sendJsonResponse(res, {assets}, 'Got assest', HttpStatus.OK);
         } catch (error) {
             this.logger.error(error.toString(), error);
         }

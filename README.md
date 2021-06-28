@@ -1,4 +1,8 @@
 <p align="center">
+  Asset tracking service for interested client in monitoring and tracking the position of an asset. Built base on NestJs
+</p>
+
+<p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
 </p>
 
@@ -53,22 +57,16 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
-# e2e tests
+# e2e/feature testing
 $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
 ```
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - [Adeyemi Adekunle]())
 
 ## License
 

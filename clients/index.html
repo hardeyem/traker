@@ -3,7 +3,7 @@
     <script src="https://cdn.socket.io/3.1.3/socket.io.min.js" integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh" crossorigin="anonymous"></script>
 
     <script>
-      const socket = io('localhost:3001', { 
+      const socket = io('localhost:3000', { 
         transports: ["websocket"],
         query: {
           lat: 0.3678374343,
@@ -14,9 +14,9 @@
       socket.on('connected', function( ) {
         console.log('Connected');
 
-        socket.emit('trackAsset', { assetId: 'YEM123' });
+        socket.emit('server:track:asset', { assetId: 'YEM1234' });
       });
-      socket.on('proximity', function(data) {
+      socket.on('client:asset:proximity', function(data) {
         console.log('proximity message', data);
       });
       socket.on('exception', function(data) {
@@ -26,8 +26,8 @@
         console.log('Disconnected');
       });
       
-      socket.on('message', function(data) {
-        console.log('General message received', data);
+      socket.on('client:asset:tracking', function(data) {
+        console.log('General message tracking received', data);
       });
     </script>
   </head>

@@ -11,17 +11,21 @@ import { WebsocketModule } from './websocket/websocket.module';
 
 import config from './core/config/config';
 import databaseConfig from './core/config/database';
+import { TestDatabaseModule } from '../test/database-in-memory';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [config, databaseConfig ],
     }),
-    MongooseModule.forRoot(databaseConfig().dbUrl, {
-      poolSize: 10,
-      keepAlive: true,
-      socketTimeoutMS: 0
-    }),
+    // MongooseModule.forRoot(databaseConfig().dbUrl, {
+    //   poolSize: 10,
+    //   keepAlive: true,
+    //   socketTimeoutMS: 0,
+    //   useNewUrlParser: true, 
+    //   useUnifiedTopology: true
+    // }),
+    TestDatabaseModule,
     CoreModule, 
     SharedModule, 
     RepositoryModule,

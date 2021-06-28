@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ConnectedUser } from 'src/repository/schemas/connected.user';
+import { ConnectedUser } from '../../../repository';
 
 @Injectable()
 export class ConnectedUserService {
@@ -14,7 +14,7 @@ export class ConnectedUserService {
      * Get all Connected users in database
      * @returns 
      */
-    getAllAssets(): Promise<ConnectedUser[]>{
+    getAllConnectedUsers(): Promise<ConnectedUser[]>{
         return this.connectedUserModel.find({}).exec();
     }
 
@@ -73,7 +73,7 @@ export class ConnectedUserService {
             minDistance: minDistance || distance,
             spherical: true,
             uniqueDocs: true,
-            query: { interestAssets: {$elemMatch: {$eq: assetId}}}
+            // query: { interestAssets: {$elemMatch: {$eq: assetId}}}
         }
 
         console.log(geoNear);

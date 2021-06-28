@@ -12,14 +12,14 @@ export class UtiliHelpers {
      * @param {*} message
      * @param {*} code
      */
-    static sendJsonResponse (res: Response, data: any, message: string, code = 200) {
+    static sendJsonResponse (res: Response, data: any, message: string, status = HttpStatus.OK, code = 200) {
         const resData = {
             success: true,
             code,
             message,
             data: data
         };
-        return res.status(HttpStatus.OK).json(resData);
+        return res.status(status).json(resData);
     }
 
     /**

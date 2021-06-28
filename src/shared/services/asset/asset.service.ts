@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Asset } from 'src/repository/schemas/asset';
-import { AddAssetDTO, AssetLocationUpdateDTO } from 'src/shared/dtos/asset.dto';
+import { Asset } from '../../../repository';
+import { AddAssetDTO, AssetLocationUpdateDTO } from '../../';
 
 @Injectable()
 export class AssetService {
@@ -52,6 +52,6 @@ export class AssetService {
                 },
                 lastBroadcastTime: new Date()
             }
-       }).exec();
+       }, {upsert: true}).exec();
     }
 }

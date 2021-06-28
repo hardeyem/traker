@@ -1,19 +1,14 @@
-import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
-import { Observable, from } from 'rxjs';
 import { Server, Socket } from 'socket.io';
-import { map } from 'rxjs/operators';
-import { AppLogger } from 'src/core';
-import { Asset } from 'src/repository/schemas/asset';
-import { UtiliHelpers } from 'src/shared/classes/helpers';
-import { ConnectedUserService } from 'src/shared/services/connected-user/connected-user.service';
+import { AppLogger } from '../core';
+import { Asset,  } from '../repository';
+import { UtiliHelpers, ConnectedUserService } from '../shared';
 
-@WebSocketGateway(3001, {transports:["websocket"], pingTimeout: 0})
+@WebSocketGateway({transports:["websocket"], pingTimeout: 0})
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-    
+
     @WebSocketServer()
     server: Server;
-    static clients: Socket[] = [];
     throttleTime = 5000;
 
     constructor(
@@ -58,10 +53,9 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
             const timeDiffer = Date.now() - new Date(asset.lastBroadcastTime).getTime();
             throttleTime = timeDiffer > this.throttleTime ? 100 : this.throttleTime - timeDiffer + 100;
         }
-        this.server.to(assetId).emit('message', asset);
         UtiliHelpers.throttle(throttleTime, () => {
             // this.logger.log('broadcasting asset location',  assetId);
-            this.server.to(assetId).emit('message', asset);
+            this.server.to(assetId).emit('client:asset:tracking', asset);
         });
     }
 
@@ -80,12 +74,11 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
             return;
         }
 
-        let users: string[]| any = await this.connectedUserSvc.getInterestedUserByDistance(long, lat, proximity[0], assetId, proximity[0]);
-        // this.logger.log('proximity users', users);
-        if(users.length > 0){
-            users = users.map((u) => u.clienId);
-            const broadCastClients = EventGateway.clients.filter(client => users.includes(client.id));
-            broadCastClients.forEach(client => client.emit('proximity', {proximity: proximity[0], assestId: assetId}));
+        const users = await this.connectedUserSvc.getInterestedUserByDistance(long, lat, proximity[0], assetId, proximity[0]);
+        if(users && users.length > 0){
+            users.forEach(user => {
+                this.server.to(user.clientId).emit('client:asset:proximity', {proximity: proximity[0], assestId: assetId});    
+            });
         }
         
         return this.sendProximityBroadcast(assetId, long, lat, proximity.slice(1));
@@ -125,11 +118,10 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         try {
             await this.connectedUserSvc.setPresence(clientQuery.userId, clientQuery);   
         } catch (error) {
-            this.logger.error('Error seeting user presence', error);
+            this.logger.error('Error seeting user presence - error -', error);
         }
 
         client.emit('connected', {}); //inform the client the user has been connected 
-        EventGateway.clients.push(client);
     }
 
     /**
@@ -146,8 +138,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         } catch (error) {
             this.logger.error('Error setting user presence on connection ', error);
         }
-        EventGateway.clients = EventGateway.clients.filter(c => c.id != client.id);
-        
     }
     
     /**
@@ -155,7 +145,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
      * @param data 
      * @param client 
      */
-    @SubscribeMessage('trackAsset')
+    @SubscribeMessage('server:track:asset')
     async trackAsset(@MessageBody() data: any, @ConnectedSocket() client: Socket): Promise<void> {
         this.logger.log('Client tracking asset', data);
         const clientQuery: any = client.handshake.query;
