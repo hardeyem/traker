@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CoreModule } from 'src/core';
-import { SharedModule } from 'src/shared/shared.module';
+import { CoreModule } from '../core';
+import { SharedModule } from '../shared';
 import { EventGateway } from './event-gateway';
 
 @Module({

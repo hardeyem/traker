@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
-import { AppLogger } from 'src/core';
-import { ConnectedUserService } from 'src/shared/services/connected-user/connected-user.service';
-import { EventGateway } from 'src/websocket/event-gateway';
+import { AppLogger } from '../../core';
+import { ConnectedUserService } from '../../shared';
+import { EventGateway } from '../../websocket';
 
 @Controller('connectedUser')
 export class ConnectedUserController {

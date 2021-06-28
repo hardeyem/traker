@@ -4,6 +4,9 @@ import { EventGateway } from './event-gateway';
 import { WsAdapter } from '@nestjs/platform-ws';
 import { io } from "socket.io-client";
 import { rejects } from 'assert';
+import { SocketIoAdapter } from './socketio.adapter';
+import { SharedModule } from 'src/shared/shared.module';
+import { CoreModule } from 'src/core';
 
 
 async function createNestApp(...gateways): Promise<INestApplication> {
@@ -11,24 +14,25 @@ async function createNestApp(...gateways): Promise<INestApplication> {
     providers: gateways,
   }).compile();
   const app = await testingModule.createNestApplication();
-  app.useWebSocketAdapter(new WsAdapter(app) as any);
+  app.useWebSocketAdapter(new SocketIoAdapter(app, true) as any);
   return app;
 }
 
 fdescribe('EventGateway', () => {
   let provider: EventGateway; 
   let ws, app;
-  const baseAddress = "http://localhost:80";
+  const baseAddress = "http://localhost:3001";
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [EventGateway],
+      imports: [SharedModule, CoreModule]
     }).compile();
 
     provider = module.get<EventGateway>(EventGateway);
 
-    // app = await createNestApp(EventGateway);
-    // await app.listenAsync(8000);
+    app = await createNestApp(EventGateway);
+    await app.listenAsync(8000);
 
   });
 
