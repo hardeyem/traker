@@ -50,6 +50,7 @@ export class UtiliHelpers {
         return function(){
             const context = this;
             setTimeout(()=> {
+                console.log('run throttle time');
                 callback.apply(context);
             }, duration);
         }

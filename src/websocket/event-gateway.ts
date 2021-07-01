@@ -29,12 +29,12 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
      * @param asset 
      * @returns 
      */
-    broadcastAssetLocation(assetId: string, asset: Asset){
+    async broadcastAssetLocation(assetId: string, asset: Asset){
         console.log('broadcastin', asset);
         if(!asset){
             return false;
         }
-        this.assetBroadcast(assetId, asset);
+        await this.assetBroadcast(assetId, asset);
 
         // send proximity broadcast
         const proximity = Array.from(Array(11), (_,x) => x == 0? x : x*10);
@@ -47,16 +47,19 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
      * @param assetId 
      * @param asset 
      */
-    assetBroadcast(assetId: string, asset: Asset){
+    async assetBroadcast(assetId: string, asset: Asset){
         let throttleTime = 5000;
         if(asset && asset.lastBroadcastTime){
             const timeDiffer = Date.now() - new Date(asset.lastBroadcastTime).getTime();
             throttleTime = timeDiffer > this.throttleTime ? 100 : this.throttleTime - timeDiffer + 100;
         }
-        UtiliHelpers.throttle(throttleTime, () => {
-            // this.logger.log('broadcasting asset location',  assetId);
+
+        throttleTime = 100;
+        console.log('broadcast throttle time', throttleTime);
+        setTimeout(() => {
+            this.logger.log('broadcasting asset location client:asset:tracking',  assetId);
             this.server.to(assetId).emit('client:asset:tracking', asset);
-        });
+        }, throttleTime);
     }
 
     /**
